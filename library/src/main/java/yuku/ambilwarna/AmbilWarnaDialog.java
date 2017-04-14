@@ -33,6 +33,7 @@ public class AmbilWarnaDialog {
     final float[] currentColorHsv = new float[3];
     final TextView hexcode;
     private final boolean supportsAlpha;
+    private boolean hexChangedByInput = true;
     int alpha;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -45,7 +46,9 @@ public class AmbilWarnaDialog {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            setColorFromHex(hexcode.getText().toString());
+            if (hexChangedByInput) {
+                setColorFromHex(editable.toString());
+            }
         }
     };
 
@@ -104,7 +107,7 @@ public class AmbilWarnaDialog {
         viewSatVal.setHue(getHue());
         viewOldColor.setBackgroundColor(color);
         viewNewColor.setBackgroundColor(color);
-        hexcode.setText(Integer.toHexString(getColor()));
+        setHexcode(Integer.toHexString(getColor()));
 
         viewHue.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -126,7 +129,7 @@ public class AmbilWarnaDialog {
                     viewSatVal.setHue(getHue());
                     moveCursor();
                     viewNewColor.setBackgroundColor(getColor());
-                    hexcode.setText(Integer.toHexString(getColor()));
+                    setHexcode(Integer.toHexString(getColor()));
                     updateAlphaView();
                     return true;
                 }
@@ -156,7 +159,7 @@ public class AmbilWarnaDialog {
                     int col = AmbilWarnaDialog.this.getColor();
                     int c = a << 24 | col & 0x00ffffff;
                     viewNewColor.setBackgroundColor(c);
-                    hexcode.setText(Integer.toHexString(getColor()));
+                    setHexcode(Integer.toHexString(getColor()));
                     return true;
                 }
                 return false;
@@ -183,7 +186,7 @@ public class AmbilWarnaDialog {
                     // update view
                     moveTarget();
                     viewNewColor.setBackgroundColor(getColor());
-                    hexcode.setText(Integer.toHexString(getColor()));
+                    setHexcode(Integer.toHexString(getColor()));
                     if (AmbilWarnaDialog.this.supportsAlpha) updateAlphaView();
 
                     return true;
@@ -276,6 +279,12 @@ public class AmbilWarnaDialog {
         viewTarget.bringToFront();
         this.viewAlphaCursor.bringToFront();
         this.viewCursor.bringToFront();
+    }
+
+    private void setHexcode(String newValue){
+        hexChangedByInput=false;
+        hexcode.setText(newValue);
+        hexChangedByInput=true;
     }
 
     protected void moveAlphaCursor() {
