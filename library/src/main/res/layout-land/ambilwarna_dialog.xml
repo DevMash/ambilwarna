@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/ambilwarna_spacer"
                     android:paddingTop="@dimen/ambilwarna_spacer"
-                    android:src="@drawable/ambilwarna_arrow_down" />
+                    android:src="@drawable/ambilwarna_arrow_right" />
 
                 <FrameLayout
                     android:layout_width="60dp"
