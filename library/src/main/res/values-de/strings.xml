@@ -1,0 +1,4 @@
+<resources>
+    <string name="copy">In die Zwischenablage kopiert</string>
+    <string name="paste">Aus der Zwischenablage wiederhergestellt</string>
+</resources>

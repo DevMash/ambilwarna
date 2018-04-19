@@ -1,6 +1,9 @@
 package yuku.ambilwarna;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -13,9 +16,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AmbilWarnaDialog {
     final AlertDialog dialog;
@@ -33,8 +38,8 @@ public class AmbilWarnaDialog {
     final float[] currentColorHsv = new float[3];
     final TextView hexcode;
     private final boolean supportsAlpha;
-    private boolean hexChangedByInput = true;
     int alpha;
+    private boolean hexChangedByInput = true;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -51,6 +56,8 @@ public class AmbilWarnaDialog {
             }
         }
     };
+    private ImageButton button_copy;
+    private ImageButton button_paste;
 
     /**
      * Create an AmbilWarnaDialog.
@@ -94,6 +101,8 @@ public class AmbilWarnaDialog {
         viewAlphaCursor = (ImageView) view.findViewById(R.id.ambilwarna_alphaCursor);
         viewAlphaCheckered = (ImageView) view.findViewById(R.id.ambilwarna_alphaCheckered);
         hexcode = (TextView) view.findViewById(R.id.hexcode);
+        button_copy = (ImageButton) view.findViewById(R.id.copy);
+        button_paste = (ImageButton) view.findViewById(R.id.paste);
 
         hexcode.addTextChangedListener(textWatcher);
 
@@ -238,6 +247,38 @@ public class AmbilWarnaDialog {
                 view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             }
         });
+
+        button_paste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard == null) {
+                    return;
+                }
+                String pasteData = "";
+
+                // If it does contain data, decide if you can handle the data.
+                if (clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                    //since the clipboard contains plain text.
+                    ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+                    pasteData = item.getText().toString();
+                    hexcode.setText(pasteData);
+                    Toast.makeText(context, context.getString(R.string.paste), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        button_copy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard == null) {
+                    return;
+                }
+                ClipData clip = ClipData.newPlainText("color", hexcode.getText());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(context, context.getString(R.string.copy), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setColorFromHex(String hexColor) {
@@ -281,10 +322,10 @@ public class AmbilWarnaDialog {
         this.viewCursor.bringToFront();
     }
 
-    private void setHexcode(String newValue){
-        hexChangedByInput=false;
+    private void setHexcode(String newValue) {
+        hexChangedByInput = false;
         hexcode.setText(newValue);
-        hexChangedByInput=true;
+        hexChangedByInput = true;
     }
 
     protected void moveAlphaCursor() {

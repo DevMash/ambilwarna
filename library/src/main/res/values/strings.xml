@@ -1,0 +1,4 @@
+<resources>
+    <string name="copy">Copy to clipboard</string>
+    <string name="paste">Paste from clipboard</string>
+</resources>
